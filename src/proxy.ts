@@ -5,6 +5,8 @@ import { authConfig } from '@/lib/auth/config';
 const { auth } = NextAuth(authConfig);
 export default auth;
 
+export const runtime = 'edge';
+
 export const config = {
   matcher: ['/admin/:path*'],
 };

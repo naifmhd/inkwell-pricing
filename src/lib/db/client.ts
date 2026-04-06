@@ -54,7 +54,7 @@ function findLocalSqlite(): string {
 
 let _devDb: DbClient | null = null;
 
-export function getDb(cloudflareEnv?: { DB: DbClient }): DbClient {
+export function getDb(): DbClient {
   if (process.env.NODE_ENV !== 'production') {
     if (!_devDb) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -64,8 +64,11 @@ export function getDb(cloudflareEnv?: { DB: DbClient }): DbClient {
     }
     return _devDb;
   }
-  if (!cloudflareEnv?.DB) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getCloudflareContext } = require('@opennextjs/cloudflare');
+  const env = getCloudflareContext().env as { DB: DbClient };
+  if (!env?.DB) {
     throw new Error('Cloudflare D1 binding (DB) not available');
   }
-  return cloudflareEnv.DB;
+  return env.DB;
 }

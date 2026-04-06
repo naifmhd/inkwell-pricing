@@ -1,12 +1,4 @@
-// Edge-safe middleware — uses only authConfig (no DB access)
-import NextAuth from 'next-auth';
-import { authConfig } from '@/lib/auth/config';
+// Auth is handled in src/app/admin/(protected)/layout.tsx
+export default function proxy() {}
 
-const { auth } = NextAuth(authConfig);
-export default auth;
-
-export const runtime = 'edge';
-
-export const config = {
-  matcher: ['/admin/:path*'],
-};
+export const config = { matcher: [] };

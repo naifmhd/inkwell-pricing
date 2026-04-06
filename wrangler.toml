@@ -7,7 +7,7 @@ main = ".open-next/worker.js"
 [[d1_databases]]
 binding = "DB"
 database_name = "inkwell-db"
-database_id   = "REPLACE_AFTER_CREATION"
+database_id   = "b3cbacdf-7d43-4352-b4b4-d0ccf2509150"
 
 [vars]
 NEXTAUTH_URL = "https://inkwell.your-subdomain.pages.dev"

@@ -4,8 +4,13 @@ import Link from 'next/link';
 import { signOut } from '@/lib/auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-  if (!session) redirect('/admin/login');
+  let session;
+  try {
+    session = await auth();
+  } catch {
+    redirect('/admin/login');
+  }
+  if (!session?.user) redirect('/admin/login');
 
   return (
     <div className="min-h-screen flex">

@@ -1,12 +1,13 @@
 {
-  "name": "laser-pricing",
+  "name": "inkwell",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "next build && npx opennextjs-cloudflare build && wrangler deploy"
   },
   "dependencies": {
     "@auth/core": "^0.41.0",

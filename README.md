@@ -29,8 +29,23 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Cloudflare
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is configured for deployment on [Cloudflare Workers](https://workers.cloudflare.com/) using [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Build for Cloudflare
+npx opennextjs-cloudflare build
+
+# Deploy
+npx wrangler deploy
+```
+
+Before deploying, make sure to:
+1. Create the D1 database: `npx wrangler d1 create inkwell-db`
+2. Update `database_id` in `wrangler.toml` with the ID from step 1
+3. Run the migration: `npx wrangler d1 execute inkwell-db --file=migrations/0001_init.sql`
+4. Create the R2 bucket: `npx wrangler r2 bucket create inkwell-files`
+5. Set the auth secret: `npx wrangler secret put NEXTAUTH_SECRET`
+
+Check out the [Cloudflare Workers documentation](https://developers.cloudflare.com/workers/) for more details.

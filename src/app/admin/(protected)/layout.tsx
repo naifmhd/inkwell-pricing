@@ -21,9 +21,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           {[
-            { href: '/admin/materials', label: 'Materials' },
-            { href: '/admin/addons',    label: 'Add-ons' },
-            { href: '/admin/config',    label: 'Pricing Config' },
+            { href: '/admin/materials',       label: 'Materials' },
+            { href: '/admin/addons',          label: 'Add-ons' },
+            { href: '/admin/config',          label: 'Pricing Config' },
+            { href: '/admin/standard-colors', label: 'Color Standard' },
           ].map(({ href, label }) => (
             <Link key={href} href={href}
               className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">

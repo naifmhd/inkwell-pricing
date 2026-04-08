@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, ReactNode } from 'react';
 import type { DxfAnalysis } from '@/lib/dxf/types';
-import type { QuoteResult } from '@/lib/pricing/types';
+import type { QuoteResult, Operation } from '@/lib/pricing/types';
 
 export interface ExtraMaterial {
   uid: string;
@@ -13,6 +13,7 @@ export interface ExtraMaterial {
 interface QuoteState {
   service: string | null;
   dxfAnalysis: DxfAnalysis | null;
+  colorOverrides: Record<string, Operation | 'ignore'>;
   materialId: number | null;
   addonIds: number[];
   widthMm: number | null;
@@ -29,7 +30,7 @@ interface QuoteContextType extends QuoteState {
 }
 
 const initial: QuoteState = {
-  service: null, dxfAnalysis: null, materialId: null, addonIds: [],
+  service: null, dxfAnalysis: null, colorOverrides: {}, materialId: null, addonIds: [],
   widthMm: null, heightMm: null, sunboardThickness: 3, result: null,
   sprayAddonId: null, extraMaterials: [],
 };

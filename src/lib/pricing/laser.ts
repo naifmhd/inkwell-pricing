@@ -23,22 +23,26 @@ export function calcLaserQuote(
   setupFeeMvr: number,
   sprayAddon?: DbAddon | null,
   extraMaterialsIn?: { material: DbMaterial; widthMm: number; heightMm: number }[],
+  colorOverrides?: Record<string, Operation | 'ignore'>,
 ): LaserQuoteResult {
   const rateMap = new Map(colorRates.map(r => [r.color_key, r]));
 
-  const colorBreakdown: ColorBreakdownLine[] = dxfAnalysis.colors.map(cg => {
-    const rateRow = rateMap.get(cg.colorKey);
-    const operation: Operation = rateRow?.operation ?? resolveOperation(cg.colorKey);
-    const rateMvrMm = rateRow?.rate_mvr_mm ?? 0;
-    return {
-      colorKey: cg.colorKey,
-      label: cg.label,
-      operation,
-      lengthMm: cg.total,
-      rateMvrMm,
-      subtotalMvr: round2(cg.total * rateMvrMm),
-    };
-  });
+  const colorBreakdown: ColorBreakdownLine[] = dxfAnalysis.colors
+    .filter(cg => colorOverrides?.[cg.colorKey] !== 'ignore')
+    .map(cg => {
+      const override = colorOverrides?.[cg.colorKey];
+      const rateRow = rateMap.get(cg.colorKey);
+      const operation: Operation = (override as Operation | undefined) ?? rateRow?.operation ?? resolveOperation(cg.colorKey);
+      const rateMvrMm = rateRow?.rate_mvr_mm ?? 0;
+      return {
+        colorKey: cg.colorKey,
+        label: cg.label,
+        operation,
+        lengthMm: cg.total,
+        rateMvrMm,
+        subtotalMvr: round2(cg.total * rateMvrMm),
+      };
+    });
 
   const pathCostMvr = round2(colorBreakdown.reduce((s, l) => s + l.subtotalMvr, 0));
   const addonsMvr = round2(addons.reduce((s, a) => s + a.price_mvr, 0));

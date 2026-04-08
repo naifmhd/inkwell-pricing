@@ -2,9 +2,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuote, type ExtraMaterial } from '@/components/quote/QuoteContext';
-import { DxfUploader } from '@/components/quote/DxfUploader';
+import { DxfUploader, type ColorOverrides } from '@/components/quote/DxfUploader';
+import { ColorGuide } from '@/components/quote/ColorGuide';
 import { Breadcrumbs } from '@/components/quote/Breadcrumbs';
 import type { DxfAnalysis } from '@/lib/dxf/types';
+import type { DbStandardColor } from '@/lib/db/queries';
 
 interface Material { id: number; name: string; thickness_mm: number; base_cost_mvr: number; active: number; }
 interface Addon { id: number; label: string; price_mvr: number; price_type: string; group_key: string | null; }
@@ -14,10 +16,11 @@ type Panel = 'spray' | 'material' | null;
 const TO_MM: Record<string, number> = { mm: 1, in: 25.4, ft: 304.8 };
 
 export default function LaserPage() {
-  const { dxfAnalysis, materialId, addonIds, sprayAddonId, extraMaterials, set } = useQuote();
+  const { dxfAnalysis, colorOverrides, materialId, addonIds, sprayAddonId, extraMaterials, set } = useQuote();
   const router = useRouter();
   const [materials, setMaterials] = useState<Material[]>([]);
   const [sprayAddons, setSprayAddons] = useState<Addon[]>([]);
+  const [standardColors, setStandardColors] = useState<DbStandardColor[]>([]);
   const [loading, setLoading] = useState(false);
   const [openPanel, setOpenPanel] = useState<Panel>(null);
 
@@ -32,6 +35,7 @@ export default function LaserPage() {
     fetch('/api/addons?service=laser').then(r => r.json()).then((all: Addon[]) =>
       setSprayAddons(all.filter(a => a.group_key === 'spray'))
     );
+    fetch('/api/dxf/standard-colors').then(r => r.json()).then(setStandardColors);
   }, []);
 
   function togglePanel(p: Panel) {
@@ -62,6 +66,7 @@ export default function LaserPage() {
         service: 'laser', dxfAnalysis, materialId, addonIds,
         sprayAddonId: sprayAddonId ?? null,
         extraMaterials: extraMaterials.map(em => ({ materialId: em.materialId, widthMm: em.widthMm, heightMm: em.heightMm })),
+        colorOverrides: Object.keys(colorOverrides).length > 0 ? colorOverrides : undefined,
       }),
     });
     set({ result: await res.json() });
@@ -81,7 +86,11 @@ export default function LaserPage() {
 
       <section className="bg-white rounded-xl border p-5 space-y-3">
         <h3 className="font-semibold text-zinc-800">1. Upload DXF File</h3>
-        <DxfUploader onAnalysed={(a: DxfAnalysis) => set({ dxfAnalysis: a })} />
+        <ColorGuide standard={standardColors} />
+        <DxfUploader
+          standardColors={standardColors}
+          onAnalysed={(a: DxfAnalysis, overrides: ColorOverrides) => set({ dxfAnalysis: a, colorOverrides: overrides })}
+        />
       </section>
 
       <section className="bg-white rounded-xl border p-5 space-y-3">

@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { analyseBuffer } from '@/lib/dxf/analyse';
+import { getDb } from '@/lib/db/client';
+import { getStandardColorMap } from '@/lib/db/queries';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +19,16 @@ export async function POST(req: NextRequest) {
     const content = new TextDecoder('utf-8').decode(bytes);
     const analysis = analyseBuffer(content);
 
-    return NextResponse.json(analysis);
+    const standardMap = await getStandardColorMap(getDb());
+    const nonStandardColors = analysis.colors
+      .map(c => c.colorKey)
+      .filter(k => !standardMap.has(k));
+
+    return NextResponse.json({
+      ...analysis,
+      nonStandardColors,
+      colorValidation: nonStandardColors.length > 0 ? 'warn' : 'ok',
+    });
   } catch (err) {
     console.error('DXF analyse error:', err);
     return NextResponse.json(

@@ -42,14 +42,19 @@ function findLocalSqlite(): string {
   if (!fs.existsSync(base)) {
     throw new Error('Local D1 database not found. Run: npx wrangler d1 execute inkwell-db --local --file=migrations/0001_init.sql');
   }
+  let best = { file: '', size: -1 };
   for (const sub of fs.readdirSync(base)) {
     const subPath = path.join(base, sub);
     if (!fs.statSync(subPath).isDirectory()) continue;
     for (const file of fs.readdirSync(subPath)) {
-      if (file.endsWith('.sqlite')) return path.join(subPath, file);
+      if (!file.endsWith('.sqlite') || file === 'metadata.sqlite') continue;
+      const fullPath = path.join(subPath, file);
+      const size = fs.statSync(fullPath).size;
+      if (size > best.size) best = { file: fullPath, size };
     }
   }
-  throw new Error('No .sqlite file found under .wrangler/state/v3/d1');
+  if (!best.file) throw new Error('No .sqlite file found under .wrangler/state/v3/d1');
+  return best.file;
 }
 
 let _devDb: DbClient | null = null;

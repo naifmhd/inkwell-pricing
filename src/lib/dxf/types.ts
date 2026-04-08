@@ -42,4 +42,6 @@ export interface DxfAnalysis {
   unitShort: string;
   entityCount: number;
   svg: string;
+  nonStandardColors?: string[];
+  colorValidation?: 'ok' | 'warn';
 }

@@ -23,6 +23,7 @@ export interface LaserQuoteRequest {
   addonIds: number[];
   sprayAddonId?: number | null;
   extraMaterials?: ExtraMaterialRequest[];
+  colorOverrides?: Record<string, Operation | 'ignore'>;
 }
 
 export interface ColorBreakdownLine {

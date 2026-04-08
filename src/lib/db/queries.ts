@@ -140,6 +140,38 @@ export async function deleteAddon(db: DbClient, id: number): Promise<void> {
   await db.prepare('DELETE FROM addons WHERE id = ?').bind(id).run();
 }
 
+// ─── Standard colors ──────────────────────────────────────────────────────────
+
+export interface DbStandardColor {
+  id: number;
+  color_key: string;
+  operation: 'cut' | 'engrave' | 'score';
+  label: string;
+  hex: string;
+}
+
+export async function getStandardColors(db: DbClient): Promise<DbStandardColor[]> {
+  const { results } = await db.prepare('SELECT * FROM standard_colors ORDER BY color_key').bind().all<DbStandardColor>();
+  return results;
+}
+
+export async function getStandardColorMap(db: DbClient): Promise<Map<string, DbStandardColor>> {
+  const rows = await getStandardColors(db);
+  return new Map(rows.map(r => [r.color_key, r]));
+}
+
+export async function upsertStandardColor(db: DbClient, sc: Omit<DbStandardColor, 'id'>): Promise<void> {
+  await db.prepare(
+    `INSERT INTO standard_colors (color_key, operation, label, hex)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(color_key) DO UPDATE SET operation = excluded.operation, label = excluded.label, hex = excluded.hex`
+  ).bind(sc.color_key, sc.operation, sc.label, sc.hex).run();
+}
+
+export async function deleteStandardColor(db: DbClient, id: number): Promise<void> {
+  await db.prepare('DELETE FROM standard_colors WHERE id = ?').bind(id).run();
+}
+
 // ─── Pricing config ───────────────────────────────────────────────────────────
 
 export async function getPricingConfig(db: DbClient): Promise<PricingConfigMap> {

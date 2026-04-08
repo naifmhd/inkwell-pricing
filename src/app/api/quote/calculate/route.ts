@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
           heightMm: em.heightMm,
         }))
       );
-      const result = calcLaserQuote(laserReq.dxfAnalysis, material, colorRates, selectedAddons, config['setup_fee_mvr'] ?? 50, sprayAddon, extraMaterialsIn.filter(em => em.material));
+      const result = calcLaserQuote(laserReq.dxfAnalysis, material, colorRates, selectedAddons, config['setup_fee_mvr'] ?? 50, sprayAddon, extraMaterialsIn.filter(em => em.material), laserReq.colorOverrides);
       return NextResponse.json(result);
     }
 
